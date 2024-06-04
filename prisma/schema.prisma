@@ -20,6 +20,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//status codes:
+//0 - msg scheduled, not sent
+//1 - first msg sent
+//2 - second msg scheduled
+//3 - second msg sent
+//4 - third msg scheduled
+//5 - third msg sent
+//6 - final waiting period
+//7 - give up
+//8 - response recieved
+
 model Record {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())

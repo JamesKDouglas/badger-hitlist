@@ -129,8 +129,26 @@ const newProfiles = [
     },
 ];
 
+const expectedFollowups = [
+    {day:1,
+    value:"5"},
+    {day:2,
+    value:"4"},
+    {day:3,
+    value:"5"},
+    {day:4,
+    value:"6"},
+    {day:5,
+    value:"2"},
+    {day:6,
+    value:"1"},
+    {day:7,
+    value:"7"},
+] 
+
 module.exports = {
     newRecords,
     newUsers,
     newProfiles,
+    expectedFollowups,
 }
