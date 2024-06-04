@@ -15,43 +15,6 @@ export async function fetchLatestData(){
     });
     return latestRec;
 }
-
-// export async function fetchReservationsPages(query: string){
-//     noStore();
-//     try{
-//         let count = 0; 
-//         if (/^\d+$/.test(query)){
-//             //This just searches for the exact value of course. I'm starting to get into like if someone types in 1, should that search for of value 100 or 201? Idk it's an edge case.
-//             let queryNum = +query;
-//             count = await prisma.reservation.count({
-//                 where: {
-//                     amount: { equals: queryNum },
-//                   }
-//             });
-//         } else {
-//             count = await prisma.reservation.count({
-//                 where: {
-//                     OR: [
-//                         {childNames: { contains: query, mode: 'insensitive' }},
-//                         {customerName: { contains: query, mode: 'insensitive' }},
-//                         {email: { contains: query, mode: 'insensitive' }},
-//                         {notes: { contains: query, mode: 'insensitive' }},
-//                     ]
-//                 }
-//             });
-//         }
-//         console.log("count of records found:", count);
-//         // let totalPages = 0;//I'm getting a typeerror stating that this is undefined? Well, I'll define it here then to make a default.
-//         const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
-//         console.log(typeof(totalPages));
-//         return totalPages;
-//     } catch(e){
-//         console.log(e);
-//     }
-
-// }
-
-
     //status codes:
     //0 - record made, no msg scheduled/sent
     //1 - msg scheduled, not sent
@@ -77,9 +40,9 @@ export async function fetchLatestData(){
     //We'll do that every time the page loads. Put it in a server side function called getUserID?
 
 export async function fetchSettings(userId){
-    const profile = await prisma.profile.findUnique{
+    const profile = await prisma.profile.findUnique({
         where: {id: userId},
-    }
+    });
     return profile.settingInt;
 }
 
@@ -87,6 +50,7 @@ async function daysToFollowup(records, settings){
 
     //The purpose of this function is to compute the number of days to followup.
     //Records come in as an array of objects, same as the placeholder data.
+    //move this to utils.js?
 
     //return an array that is a tally.
     //0 days, 1 days, 2 days, 3 days etc.
@@ -148,7 +112,15 @@ async function daysToFollowup(records, settings){
     }
     
     return tally;
+}
 
+export async function fetchCardData(){
+// returns :
+// msgsThisWeek (integer),
+// quote (string),
+// msgsSentTotal (int),
+    let test = {msgsThisWeek: "10", quote:'hello',msgsSentTotal:"10",};
+    return test;
 }
 
 export async function fetchUpcomingWork(){
@@ -164,13 +136,9 @@ export async function fetchUpcomingWork(){
 
     //get all the reservations made in the past 8 days
     let days = 8;
-
     let now = new Date();
     let past = new Date();
-
     past.setDate(past.getDate() - days);
-
-
 
     const upcomingRec = await prisma.record.findMany({
         where: {
@@ -180,233 +148,7 @@ export async function fetchUpcomingWork(){
             }
         }
     });
-
-    //now summarize how many people are coming in each day OR each week.
-    //what does the object look like when returned by prisma? What kind of methods does it have?
-
-    // right now there is a "one child one reservation" policy. Parents can still use autofill on the form of course. But they can't literally just set # of children to 2 or more on a single form - there is only one place for the child name.
-
-    // I should put in an easter egg for "Johnny" "DROP TABLE". Just console log a "lol, good one." Confetti?
-
-    // console.log(upcomingRes)
-
-    //fudge it for now,
-    return expectedAttendance;
-    // let summaryAtt = [];
-    // if (period == "days"){
-    //     //
-    //     for (let i=0;i<6;i++){
-
-    //         summaryAtt.push()
-    //     }
-    // } else if (period == "weeks"){
-
-    // }
-
+    return upcomingRec;
 }
 
-export async function fetchSchedules(){
-    // noStore();//I don't really want the whole schedule table being looked up with each reservation search.
-    const allSchedules = await prisma.schedule.findMany();
-    // console.log(allSchedules);
-    return allSchedules;
-}
 
-export async function fetchScheduleById(id:string){
-    let idNum = Number(id);
-    const schedule = await prisma.schedule.findUnique({
-        where: {id:idNum},
-    })
-    return schedule;
-}
-
-export async function fetchFilteredSchedules(
-    query: string, 
-    currentPage:number,){
-
-    noStore();
-    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
-    try{
-        let data: Schedules; 
-        
-        data = await prisma.schedule.findMany({
-            skip: offset,
-            take: ITEMS_PER_PAGE,
-            orderBy: [
-                {
-                    id: 'desc',
-                }
-            ],
-            where: {
-                OR: [
-                    {desc: { contains: query, mode: 'insensitive' }},
-                    {name: { contains: query, mode: 'insensitive' }},
-                    // {startList: { contains: query, mode: 'insensitive' }},
-                    // {endList: { contains: query, mode: 'insensitive' }},
-                ]
-            }
-        });
-        
-        // console.log(data);
-        return data;
-    } catch (e){
-        console.log(e);
-    }    
-}
-
-export async function fetchFilteredReservations(
-    query: string, 
-    currentPage:number,){
-
-    noStore();
-    const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-
-    try{
-        // If I type in '100' in the search it better return all invoices that are $100, right?
-        //Then I need to handle the typing.
-        let data: LatestReservations; //This is just an array of reservations - whether it's the latest or all of them!
-        if (/^\d+$/.test(query)){
-            //This just searches for the exact value of course. I'm starting to get into like if someone types in 1, should that search for invoice of value 100 or 201? Idk it's an edge case.
-            let queryNum = +query;
-            data = await prisma.reservation.findMany({
-                orderBy: [
-                    {
-                        id: 'desc',
-                    }
-                ],
-                where: {
-                    amount: { equals: queryNum },
-                  }
-            });
-        } else {
-            data = await prisma.reservation.findMany({
-                skip: offset,
-                take: ITEMS_PER_PAGE,
-                orderBy: [
-                    {
-                        id: 'desc',
-                    }
-                ],
-                where: {
-                    OR: [
-                        {childNames: { contains: query, mode: 'insensitive' }},
-                        {customerName: { contains: query, mode: 'insensitive' }},
-                        {email: { contains: query, mode: 'insensitive' }},
-                        {notes: { contains: query, mode: 'insensitive' }},
-                    ]
-                }
-            });
-        }
-        // console.log(data);
-        return data;
-    } catch (e){
-        console.log(e);
-    }    
-}
-
-export async function fetchSchedulesPages(query: string){
-    noStore();
-    try{
-        let count = 0; 
-        count = await prisma.schedule.count({
-            where: {
-                OR: [
-                    {desc: { contains: query, mode: 'insensitive' }},
-                    {name: { contains: query, mode: 'insensitive' }},
-                    // {startList: { contains: query, mode: 'insensitive' }},
-                    // {endList: { contains: query, mode: 'insensitive' }},
-                ]
-            }
-        });
-        
-        console.log("count of schedules found:", count);
-        // let totalPages = 0;//I'm getting a typeerror stating that this is undefined? Well, I'll define it here then to make a default.
-        const totalPages = Math.ceil(count / ITEMS_PER_PAGE);
-        console.log(typeof(totalPages));
-        return totalPages;
-    } catch(e){
-        console.log(e);
-    }
-
-}
-
-export async function fetchReservationById(id: number){
-    noStore();
-    try{
-        const reservation = await prisma.reservation.findUnique({
-            where:{ id: id },
-        });
-
-        if (!reservation){
-            throw new Error("No reservations returned from the database?!?")
-        }
-//I want to convert reservation.amount from pennies to dollars but Typescript will have none of that.
-//Some problem with Decimal type?
-//I've turned off typescript error reporting for now so,
-        reservation.amount = reservation.amount/100;
-        return reservation;
-    } catch(e){
-        console.log(e);
-    }
-}
-
-export async function fetchCardData(){
-    noStore();//no caching - this is supposed to be a live readout.
-
-    let reservationsThisYear;//all the actual records of reservations
-    
-    let thisYear = new Date().getFullYear();
-    let start = new Date(`January 1, ${thisYear}`);
-    
-    let resThisYr;//how many reservations
-    let custThisYr =0;
-
-    let revThisYr =0;//rev for revenue
-    let paymentOutst =0;
-
-    try{
-        //Prisma will return an array of object, not an object of objects.
-        reservationsThisYear = await prisma.reservation.findMany(
-            {
-                where: {
-                    createdAt:{
-                        gte: start,
-                    }
-                }
-
-            }
-        );
-        // console.log(reservationsThisYear);
-
-        resThisYr = Object.keys(reservationsThisYear).length;
-
-        let custNames = reservationsThisYear.map((el: Reservation)=>el.customerName);
-        let custNamesSet = new Set(custNames);        
-        custThisYr = custNamesSet.size;
-
-        revThisYr = reservationsThisYear.map((el: Reservation) => +el.amount).reduce((a:number,c:number)=> a+c, 0);
-        
-        paymentOutst = reservationsThisYear.map((el: Reservation) => {
-            if (el.paid==false){
-                return +el.amount;
-            } else {
-                return 0;
-            }
-        }).reduce((a:number,c:number) => a+c,0);
-
-        // console.log("payment values outstanding:", paymentOutst);
-        // paymentOutst = paymentOutst.reduce((a:number,c:number)=>a+c,0);
-        return {
-            revThisYr,
-            paymentOutst,
-            resThisYr,
-            custThisYr,
-        }
-
-    } catch(err) {
-        console.log(err);
-        throw new Error("trouble with card data");
-    }
-
-}

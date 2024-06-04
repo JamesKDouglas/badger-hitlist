@@ -1,6 +1,6 @@
 import { Card } from '@/app/ui/dashboard/cards';
-import FollowUpsChart from '@/app/ui/dashboard/followups-chart';
-import LatestFollowups from '@/app/ui/dashboard/latest-followups';
+import Chart from '@/app/ui/dashboard/chart';
+import LatestEntries from '@/app/ui/dashboard/latest-entries';
 import { lusitana } from '@/app/ui/fonts';
 import { Suspense } from 'react';
 import { ChartSkeleton, LatestFollowupsSkeleton, CardsSkeleton } from '@/app/ui/skeletons';
@@ -22,8 +22,8 @@ export default async function Page() {
         <Suspense fallback = {<ChartSkeleton/>}>
           <Chart/>
         </Suspense>
-        <Suspense fallback = {<LatestDataSkeleton/>}>
-          <LatestData/>
+        <Suspense fallback = {<LatestFollowupsSkeleton/>}>
+          <LatestEntries/>
         </Suspense>
       </div>
     </main>

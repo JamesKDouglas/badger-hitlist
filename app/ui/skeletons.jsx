@@ -2,6 +2,24 @@
 const shimmer =
   'before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-white/60 before:to-transparent';
 
+export default function DashboardSkeleton() {
+  return (
+    <>
+      <div
+        className={`${shimmer} relative mb-4 h-8 w-36 overflow-hidden rounded-md bg-gray-100`}
+      />
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <CardsSkeleton />
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
+        <ChartSkeleton />
+        {/* shirin's edit has no table */}
+        {/* <TableSkeleton /> */}
+      </div>
+    </>
+  );
+}
+
 export function CardSkeleton() {
   return (
     <div
@@ -24,12 +42,11 @@ export function CardsSkeleton() {
       <CardSkeleton />
       <CardSkeleton />
       <CardSkeleton />
-      <CardSkeleton />
     </>
   );
 }
 
-export function Chart1Skeleton() {
+export function ChartSkeleton() {
   return (
     <div className={`${shimmer} relative w-full overflow-hidden md:col-span-4`}>
       <div className="mb-4 h-8 w-36 rounded-md bg-gray-100" />
@@ -44,6 +61,7 @@ export function Chart1Skeleton() {
   );
 }
 
+//right now we don't use these at all:
 export function TableEntrySkeleton() {
   return (
     <div className="flex flex-row items-center justify-between border-b border-gray-100 py-4">
@@ -59,7 +77,7 @@ export function TableEntrySkeleton() {
   );
 }
 
-export function LatestTableSkeleton() {
+export function LatestFollowupsSkeleton() {
   return (
     <div
       className={`${shimmer} relative flex w-full flex-col overflow-hidden md:col-span-4`}
@@ -67,11 +85,11 @@ export function LatestTableSkeleton() {
       <div className="mb-4 h-8 w-36 rounded-md bg-gray-100" />
       <div className="flex grow flex-col justify-between rounded-xl bg-gray-100 p-4">
         <div className="bg-white px-6">
-          <ReservationSkeleton />
-          <ReservationSkeleton />
-          <ReservationSkeleton />
-          <ReservationSkeleton />
-          <ReservationSkeleton />
+          <TableRowSkeleton />
+          <TableRowSkeleton />
+          <TableRowSkeleton />
+          <TableRowSkeleton />
+          <TableRowSkeleton />
           <div className="flex items-center pb-2 pt-6">
             <div className="h-5 w-5 rounded-full bg-gray-200" />
             <div className="ml-2 h-4 w-20 rounded-md bg-gray-200" />
@@ -79,26 +97,6 @@ export function LatestTableSkeleton() {
         </div>
       </div>
     </div>
-  );
-}
-
-export default function DashboardSkeleton() {
-  return (
-    <>
-      <div
-        className={`${shimmer} relative mb-4 h-8 w-36 overflow-hidden rounded-md bg-gray-100`}
-      />
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-        <CardSkeleton />
-      </div>
-      <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-4 lg:grid-cols-8">
-        <Chart1Skeleton />
-        <LatestTableSkeleton />
-      </div>
-    </>
   );
 }
 
@@ -152,18 +150,18 @@ export function TableEntriesMobileSkeleton() {
   );
 }
 
-export function Table1Skeleton() {
+export function TableSkeleton() {
   return (
     <div className="mt-6 flow-root">
       <div className="inline-block min-w-full align-middle">
         <div className="rounded-lg bg-gray-50 p-2 md:pt-0">
           <div className="md:hidden">
-            <ReservationsMobileSkeleton />
-            <ReservationsMobileSkeleton />
-            <ReservationsMobileSkeleton />
-            <ReservationsMobileSkeleton />
-            <ReservationsMobileSkeleton />
-            <ReservationsMobileSkeleton />
+            <TableEntriesMobileSkeleton />
+            <TableEntriesMobileSkeleton />
+            <TableEntriesMobileSkeleton />
+            <TableEntriesMobileSkeleton />
+            <TableEntriesMobileSkeleton />
+            <TableEntriesMobileSkeleton />
           </div>
           <table className="hidden min-w-full text-gray-900 md:table">
             <thead className="rounded-lg text-left text-sm font-normal">
